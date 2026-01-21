@@ -19,7 +19,7 @@ cortex-m = "0.7.7"
 nrf-pac = { version = "0.2.0" }
 
 [features]
-_check = ["nrf52840"]
+_check = ["fast-ru", "nrf52840"]
 fast-ru = []
 nrf51 = ["nrf-pac/nrf51"]
 nrf52810 = ["nrf-pac/nrf52810"]

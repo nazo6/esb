@@ -12,23 +12,23 @@ jobs:
     strategy:
       matrix:
         include:
-          - feature: nrf51,
+          - feature: nrf51
             target: thumbv6m-none-eabi
             rust: nightly
 
-          - feature: nrf52810,
+          - feature: nrf52810
             target: thumbv7em-none-eabi
             rust: nightly
 
-          - feature: nrf52832,
+          - feature: nrf52832
             target: thumbv7em-none-eabihf
             rust: nightly
 
-          - feature: nrf52840,
+          - feature: nrf52840
             target: thumbv7em-none-eabihf
             rust: nightly
 
-          - feature: nrf52840,fast-ru,
+          - feature: nrf52840,fast-ru
             target: thumbv7em-none-eabihf
             rust: nightly
 

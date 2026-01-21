@@ -14,23 +14,22 @@
 // use nrf52840_pac as pac;
 
 use nrf_pac::{
-    self as pac,
+    self as pac, TIMER0, TIMER1, TIMER2,
     radio::{
         regs::{Int as RadioInt, Prefix0, Prefix1, Rxaddresses},
         vals::{Crcstatus, Endian, Len, Mode},
     },
     timer::{regs::Int as TimerInt, vals::Bitmode},
-    TIMER0, TIMER1, TIMER2,
 };
 
-use core::sync::atomic::{compiler_fence, Ordering};
+use core::sync::atomic::{Ordering, compiler_fence};
 
 use crate::{
+    Error,
     app::{Addresses, FramedConsumer},
     payload::{PayloadR, PayloadW},
-    Error,
 };
-pub(crate) use pac::{radio::vals::Txpower, radio::Radio, Interrupt};
+pub(crate) use pac::{Interrupt, radio::Radio, radio::vals::Txpower};
 // TODO
 pub use pac::RADIO;
 
@@ -57,8 +56,7 @@ pub(crate) enum RxPayloadState {
     BadCRC,
 }
 
-pub struct EsbRadio<const OUT: usize, const IN: usize>
-{
+pub struct EsbRadio<const OUT: usize, const IN: usize> {
     radio: Radio,
     tx_grant: Option<PayloadR<OUT>>,
     rx_grant: Option<PayloadW<IN>>,
@@ -67,8 +65,7 @@ pub struct EsbRadio<const OUT: usize, const IN: usize>
     cached_pipe: u8,
 }
 
-impl<const OUT: usize, const IN: usize> EsbRadio<OUT, IN>
-{
+impl<const OUT: usize, const IN: usize> EsbRadio<OUT, IN> {
     pub(crate) fn new(radio: Radio) -> Self {
         EsbRadio {
             radio,
@@ -100,7 +97,10 @@ impl<const OUT: usize, const IN: usize> EsbRadio<OUT, IN>
 
         // Enable fast ramp-up
         #[cfg(feature = "fast-ru")]
-        self.radio.modecnf0.modify(|w| w.ru().fast());
+        {
+            use nrf_pac::radio::vals::Ru;
+            self.radio.modecnf0().modify(|w| w.set_ru(Ru::FAST));
+        }
 
         self.radio.txpower().write(|w| w.set_txpower(tx_power));
 
