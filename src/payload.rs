@@ -1,21 +1,23 @@
 use crate::Error;
 use bbqueue::{
-    traits::{coordination::cas::AtomicCoord, notifier::maitake::MaiNotSpsc, storage::Inline},
     BBQueue,
+    traits::{notifier::maitake::MaiNotSpsc, storage::Inline},
 };
 use core::ops::{Deref, DerefMut};
 
+#[cfg(feature = "critical-section")]
+type CoordType = bbqueue::traits::coordination::cs::CsCoord;
+#[cfg(not(feature = "critical-section"))]
+type CoordType = bbqueue::traits::coordination::cas::AtomicCoord;
+
+pub(crate) type BBQueueType<const N: usize> = BBQueue<Inline<N>, CoordType, MaiNotSpsc>;
 // | SW USE                        |               ACTUAL DMA PART                                    |
 // | rssi - 1 byte | pipe - 1 byte | length - 1 byte | pid_no_ack - 1 byte | payload - 1 to 252 bytes |
 
-type FramedGrantR<const N: usize> = bbqueue::prod_cons::framed::FramedGrantR<
-    &'static BBQueue<Inline<N>, AtomicCoord, MaiNotSpsc>,
-    u16,
->;
-type FramedGrantW<const N: usize> = bbqueue::prod_cons::framed::FramedGrantW<
-    &'static BBQueue<Inline<N>, AtomicCoord, MaiNotSpsc>,
-    u16,
->;
+type FramedGrantR<const N: usize> =
+    bbqueue::prod_cons::framed::FramedGrantR<&'static BBQueueType<N>, u16>;
+type FramedGrantW<const N: usize> =
+    bbqueue::prod_cons::framed::FramedGrantW<&'static BBQueueType<N>, u16>;
 
 /// A builder for an `EsbHeader` structure
 ///

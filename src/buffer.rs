@@ -1,10 +1,10 @@
 use crate::{
+    Config, Error,
     app::{Addresses, EsbApp},
     irq::{Disabled, EsbIrq, IrqTimer},
+    payload::BBQueueType,
     peripherals::{EsbRadio, EsbTimer},
-    Config, Error,
 };
-use bbqueue::{nicknames::Texas, traits::notifier::maitake::MaiNotSpsc};
 use core::{
     marker::PhantomData,
     sync::atomic::{AtomicBool, Ordering},
@@ -45,8 +45,8 @@ use nrf_pac::radio::Radio;
 /// };
 /// ```
 pub struct EsbBuffer<const OUT: usize, const IN: usize> {
-    pub app_to_radio_buf: Texas<OUT, MaiNotSpsc>,
-    pub radio_to_app_buf: Texas<IN, MaiNotSpsc>,
+    pub app_to_radio_buf: BBQueueType<OUT>,
+    pub radio_to_app_buf: BBQueueType<IN>,
     pub timer_flag: AtomicBool,
 }
 

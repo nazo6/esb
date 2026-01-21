@@ -1,24 +1,15 @@
 use crate::{
-    payload::{EsbHeader, PayloadR, PayloadW},
-    //     peripherals::{Interrupt, NVIC},
     Error,
-};
-use bbqueue::{
-    traits::{coordination::cas::AtomicCoord, notifier::maitake::MaiNotSpsc, storage::Inline},
-    BBQueue,
+    payload::{BBQueueType, EsbHeader, PayloadR, PayloadW},
 };
 use core::default::Default;
 use cortex_m::peripheral::NVIC;
 use nrf_pac::Interrupt;
 
-pub(crate) type FramedProducer<const N: usize> = bbqueue::prod_cons::framed::FramedProducer<
-    &'static BBQueue<Inline<N>, AtomicCoord, MaiNotSpsc>,
-    u16,
->;
-pub(crate) type FramedConsumer<const N: usize> = bbqueue::prod_cons::framed::FramedConsumer<
-    &'static BBQueue<Inline<N>, AtomicCoord, MaiNotSpsc>,
-    u16,
->;
+pub(crate) type FramedProducer<const N: usize> =
+    bbqueue::prod_cons::framed::FramedProducer<&'static BBQueueType<N>, u16>;
+pub(crate) type FramedConsumer<const N: usize> =
+    bbqueue::prod_cons::framed::FramedConsumer<&'static BBQueueType<N>, u16>;
 
 /// This is the primary Application-side interface.
 ///
