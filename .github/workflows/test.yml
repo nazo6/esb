@@ -1,8 +1,8 @@
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 name: Test Suite
 
@@ -10,14 +10,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v6
+
+      - name: Setup rust
+        uses: ./.github/workflows/setup-rust
         with:
-          profile: minimal
-          toolchain: stable
-          target: thumbv7em-none-eabihf
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --features=52832
+          target: "thumbv6m-none-eabi,thumbv7em-none-eabihf"
+
+      - name: Run rust tests
+        run: cargo test --features=nrf52832

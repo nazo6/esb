@@ -21,4 +21,7 @@ nrf-pac = { version = "0.2.0" }
 [features]
 _check = ["nrf52840"]
 fast-ru = []
+nrf51 = ["nrf-pac/nrf51"]
+nrf52810 = ["nrf-pac/nrf52810"]
+nrf52832 = ["nrf-pac/nrf52832"]
 nrf52840 = ["nrf-pac/nrf52840"]

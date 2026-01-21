@@ -1,8 +1,8 @@
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 name: Continuous integration
 
@@ -12,39 +12,33 @@ jobs:
     strategy:
       matrix:
         include:
-          - feature: 51,
-            target: thumbv6m-none-eabi
-            rust: stable
-          - feature: 51,
+          - feature: nrf51,
             target: thumbv6m-none-eabi
             rust: nightly
-            experimental: true
-          - feature: 52810,
+
+          - feature: nrf52810,
             target: thumbv7em-none-eabi
-            rust: stable
-          - feature: 52832,
-            target: thumbv7em-none-eabihf
-            rust: stable
-          - feature: 52832,
+            rust: nightly
+
+          - feature: nrf52832,
             target: thumbv7em-none-eabihf
             rust: nightly
-            experimental: true
-          - feature: 52840,
+
+          - feature: nrf52840,
             target: thumbv7em-none-eabihf
-            rust: stable
-          - feature: 52832,fast-ru,
+            rust: nightly
+
+          - feature: nrf52840,fast-ru,
             target: thumbv7em-none-eabihf
-            rust: stable
+            rust: nightly
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.rust }}
-      - run: rustup target add thumbv7em-none-eabihf thumbv7em-none-eabi thumbv6m-none-eabi
+      - uses: actions/checkout@v6
 
-      - uses: actions-rs/cargo@v1
+      - name: Setup rust
+        uses: ./.github/workflows/setup-rust
         with:
-          command: build
-          args: --features=${{ matrix.feature }} --target=${{ matrix.target }}
+          target: "thumbv6m-none-eabi,thumbv7em-none-eabihf"
+
+      - name: Run rust check
+        run: cargo build --features=${{ matrix.feature }} --target=${{ matrix.target }}
