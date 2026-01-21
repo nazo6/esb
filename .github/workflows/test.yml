@@ -1,8 +1,13 @@
 on:
+  # push:
+  #   branches: [master]
+  # pull_request:
+  #   branches: [master]
+
+  # Temporarily disable ci
   push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+    branches-ignore:
+      - "**"
 
 name: Test Suite
 

@@ -38,7 +38,7 @@ jobs:
       - name: Setup rust
         uses: ./.github/workflows/setup-rust
         with:
-          target: "thumbv6m-none-eabi,thumbv7em-none-eabihf"
+          target: "thumbv6m-none-eabi,thumbv7em-none-eabi"
 
       - name: Run rust check
         run: cargo build --features=${{ matrix.feature }} --target=${{ matrix.target }}
