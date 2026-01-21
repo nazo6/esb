@@ -4,11 +4,11 @@ use crate::{
     peripherals::{EsbRadio, EsbTimer},
     Config, Error,
 };
+use bbqueue::{nicknames::Texas, traits::notifier::maitake::MaiNotSpsc};
 use core::{
     marker::PhantomData,
     sync::atomic::{AtomicBool, Ordering},
 };
-use bbq2::{nicknames::Texas, traits::notifier::maitake::MaiNotSpsc};
 use nrf_pac::radio::Radio;
 
 /// This is the backing structure for the ESB interface
@@ -44,15 +44,13 @@ use nrf_pac::radio::Radio;
 ///     timer_flag: AtomicBool::new(false),
 /// };
 /// ```
-pub struct EsbBuffer<const OUT: usize, const IN: usize>
-{
+pub struct EsbBuffer<const OUT: usize, const IN: usize> {
     pub app_to_radio_buf: Texas<OUT, MaiNotSpsc>,
     pub radio_to_app_buf: Texas<IN, MaiNotSpsc>,
     pub timer_flag: AtomicBool,
 }
 
-impl<const OUT: usize, const IN: usize> EsbBuffer<OUT, IN>
-{
+impl<const OUT: usize, const IN: usize> EsbBuffer<OUT, IN> {
     /// Attempt to split the `static` buffer into handles for Interrupt and App context
     ///
     /// This function will only succeed once. If the underlying buffers have also
@@ -67,14 +65,7 @@ impl<const OUT: usize, const IN: usize> EsbBuffer<OUT, IN>
         radio: Radio,
         addresses: Addresses,
         config: Config,
-    ) -> Result<
-        (
-            EsbApp<OUT, IN>,
-            EsbIrq<OUT, IN, T, Disabled>,
-            IrqTimer<T>,
-        ),
-        Error,
-    > {
+    ) -> Result<(EsbApp<OUT, IN>, EsbIrq<OUT, IN, T, Disabled>, IrqTimer<T>), Error> {
         let (atr_prod, atr_cons) = (
             self.app_to_radio_buf.framed_producer(),
             self.app_to_radio_buf.framed_consumer(),
