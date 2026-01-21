@@ -10,7 +10,7 @@ type CoordType = bbqueue::traits::coordination::cs::CsCoord;
 #[cfg(not(feature = "critical-section"))]
 type CoordType = bbqueue::traits::coordination::cas::AtomicCoord;
 
-pub(crate) type BBQueueType<const N: usize> = BBQueue<Inline<N>, CoordType, MaiNotSpsc>;
+pub type BBQueueType<const N: usize> = BBQueue<Inline<N>, CoordType, MaiNotSpsc>;
 // | SW USE                        |               ACTUAL DMA PART                                    |
 // | rssi - 1 byte | pipe - 1 byte | length - 1 byte | pid_no_ack - 1 byte | payload - 1 to 252 bytes |
 
