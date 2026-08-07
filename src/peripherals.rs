@@ -80,7 +80,7 @@ impl<const OUT: usize, const IN: usize> EsbRadio<OUT, IN> {
     pub(crate) fn init(&mut self, max_payload: u8, tx_power: Txpower, addresses: &Addresses) {
         // Disables all interrupts, Nordic's code writes to all bits, seems to be okay
         self.radio.intenclr().write_value(RadioInt(0xFFFF_FFFF));
-        self.radio.mode().write(|w| w.set_mode(Mode::NRF_2MBIT));
+        self.radio.mode().write(|w| w.set_mode(Mode::Nrf2mbit));
         let len_bits = if max_payload <= 32 { 6 } else { 8 };
         // Convert addresses to remain compatible with nRF24L devices
         let base0 = address_conversion(u32::from_le_bytes(addresses.base0));
@@ -99,7 +99,7 @@ impl<const OUT: usize, const IN: usize> EsbRadio<OUT, IN> {
         #[cfg(feature = "fast-ru")]
         {
             use nrf_pac::radio::vals::Ru;
-            self.radio.modecnf0().modify(|w| w.set_ru(Ru::FAST));
+            self.radio.modecnf0().modify(|w| w.set_ru(Ru::Fast));
         }
 
         self.radio.txpower().write(|w| w.set_txpower(tx_power));
@@ -116,7 +116,7 @@ impl<const OUT: usize, const IN: usize> EsbRadio<OUT, IN> {
             // Nordic's code doesn't use whitening, maybe enable in the future ?
             // w.set_whiteen(true);
             w.set_statlen(0);
-            w.set_endian(Endian::BIG);
+            w.set_endian(Endian::Big);
         });
 
         self.radio
@@ -127,7 +127,7 @@ impl<const OUT: usize, const IN: usize> EsbRadio<OUT, IN> {
             .crcpoly()
             .write(|w| w.set_crcpoly(CRC_POLY & 0x00FF_FFFF));
 
-        self.radio.crccnf().write(|w| w.set_len(Len::TWO));
+        self.radio.crccnf().write(|w| w.set_len(Len::Two));
 
         self.radio.base0().write_value(base0);
         self.radio.base1().write_value(base1);
@@ -277,7 +277,7 @@ impl<const OUT: usize, const IN: usize> EsbRadio<OUT, IN> {
     // The upper stack is responsible for checking and disabling the timeouts
     #[inline]
     pub(crate) fn check_ack(&mut self) -> Result<bool, Error> {
-        let ret = self.radio.crcstatus().read().crcstatus() == Crcstatus::CRCOK;
+        let ret = self.radio.crcstatus().read().crcstatus() == Crcstatus::CrcOk;
         // "Subsequent reads and writes cannot be moved ahead of preceding reads."
         compiler_fence(Ordering::Acquire);
 
@@ -341,7 +341,7 @@ impl<const OUT: usize, const IN: usize> EsbRadio<OUT, IN> {
         // If the user didn't provide a packet to send, we will fall back to this empty ack packet
         static FALLBACK_ACK: [u8; 2] = [0, 0];
 
-        if self.radio.crcstatus().read().crcstatus() == Crcstatus::CRCERROR {
+        if self.radio.crcstatus().read().crcstatus() == Crcstatus::CrcError {
             // Bad CRC, clear events and restart RX.
             self.stop(false);
             self.radio.shorts().modify(|w| w.set_disabled_txen(true));
@@ -595,7 +595,7 @@ impl<T: PtrTimer + sealed::Sealed> EsbTimer for T {
         Self::stop();
         self.timer()
             .bitmode()
-            .write(|w| w.set_bitmode(Bitmode::_32BIT));
+            .write(|w| w.set_bitmode(Bitmode::_32bit));
         // 2^4 = 16
         // 16 MHz / 16 = 1 MHz = µs resolution
         self.timer().prescaler().write(|w| w.set_prescaler(4));

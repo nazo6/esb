@@ -185,7 +185,7 @@ impl Default for Config {
             retransmit_delay: RETRANSMIT_DELAY,
             maximum_transmit_attempts: MAXIMUM_TRANSMIT_ATTEMPTS,
             enabled_pipes: ENABLED_PIPES,
-            tx_power: TxPower::_0_DBM,
+            tx_power: TxPower::_0dBm,
             maximum_payload_size: 252,
         }
     }
